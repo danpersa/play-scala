@@ -1,0 +1,17 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET        /                           controllers.Application.index
+GET        /hello/:name                controllers.Application.hello(name: String)
+GET        /hello-delayed/:name        controllers.Application.helloDelayed(name: String)
+GET        /users                      controllers.Application.users
+GET        /couchbase                  controllers.Application.couchbase
+GET        /couchbase1                 controllers.Application.couchbase1
+
+GET        /restaurants/populate       controllers.RestaurantsController.populate
+GET        /restaurants/:id            controllers.RestaurantsController.show(id)
+
+# Map static resources from the /public folder to the /assets URL path
+GET        /assets/*file               controllers.Assets.at(path="/public", file)
