@@ -11,5 +11,6 @@ libraryDependencies ++= Seq(
   anorm,
   cache,
   ws,
-  "com.couchbase.client" % "couchbase-client" % "1.4.2"
+  "com.couchbase.client" % "couchbase-client" % "1.4.2",
+  "com.sksamuel.elastic4s" %% "elastic4s" % "1.2.1.1"
 )
