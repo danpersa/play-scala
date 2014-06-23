@@ -9,6 +9,7 @@ import play.api.data.validation.ValidationError
 import datasources.Couchbase
 import model.SimpleRestaurant
 import scala.collection.JavaConversions
+import com.sksamuel.elastic4s.source.DocumentSource
 
 trait Restaurant extends Identity {
   val name: String
@@ -23,10 +24,17 @@ object Restaurant {
     )
   }
 
+  implicit val simpleRestaurantReads: Reads[SimpleRestaurant] = (
+    (JsPath \ "id").read[String] and
+      (JsPath \ "name").read[String]
+    )(SimpleRestaurant.apply _)
+
   def from(restaurant: Restaurant): SimpleRestaurant = new SimpleRestaurant(restaurant.id, restaurant.name)
 }
 
-case class SimpleRestaurant(id: String, name: String) extends Identity with Restaurant
+case class SimpleRestaurant(id: String, name: String) extends Identity with Restaurant with DocumentSource {
+  def json = Json.stringify(Json.toJson(this))
+}
 
 object SimpleRestaurant {
   

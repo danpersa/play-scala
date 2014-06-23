@@ -11,6 +11,10 @@ import play.api.libs.functional.syntax._
  */
 case class DatabaseRestaurant(id: String, name: String, t: String = DatabaseRestaurant.getClass.getSimpleName) extends Identity with Restaurant
 
+class DatabaseRestaurantBuilder extends RestaurantBuilder[DatabaseRestaurant] {
+  def build = DatabaseRestaurant(id, name)
+}
+
 object DatabaseRestaurant {
 
   implicit val databaseRestaurantWrites = new Writes[DatabaseRestaurant] {
@@ -21,7 +25,7 @@ object DatabaseRestaurant {
     )
   }
 
-  implicit val databaseRestaurangReads: Reads[DatabaseRestaurant] = (
+  implicit val databaseRestaurantReads: Reads[DatabaseRestaurant] = (
     (JsPath \ "id").read[String] and
     (JsPath \ "name").read[String] and
     (JsPath \ "type").read[String]
@@ -50,6 +54,8 @@ object DatabaseRestaurant {
     val restaurantsJson = Json.parse(restaurantsJsonString)
     restaurantsJson.as[List[DatabaseRestaurant]]
   }
+
+  def builder = new DatabaseRestaurantBuilder
 }
 
 

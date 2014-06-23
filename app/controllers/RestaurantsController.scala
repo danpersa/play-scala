@@ -1,7 +1,7 @@
 package controllers
 
-import play.api.mvc.{Action, Controller}
-import model.{DatabaseRestaurant, SimpleRestaurant}
+import play.api.mvc.{BodyParsers, Action, Controller}
+import model.{Restaurant, DatabaseRestaurant, SimpleRestaurant}
 import play.api.libs.json._
 import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
@@ -16,24 +16,17 @@ object RestaurantsController extends Controller {
   def search = Action {
     val client = ElasticClient.remote("localhost", 9300)
     client.execute {
-      create index "places" mappings (
-        "cities" as (
-          "id" typed IntegerType,
-          "name" typed StringType boost 4,
-          "content" typed StringType analyzer StopAnalyzer
+      create index "restaurants" mappings (
+        "restaurants" as (
+          "id" typed StringType,
+          "name" typed StringType boost 4
           )
         )
     }
 
     client.execute {
-      index into "places/cities" id "uk" fields (
-        "name" -> "London",
-        "country" -> "United Kingdom",
-        "continent" -> "Europe",
-        "status" -> "Awesome"
-        )
+      index into "restaurants/restaurants" id "sim" doc SimpleRestaurant("sim-rest", "The Birdy")
     }
-    println("XXXX: Search")
     
     Ok("Ok")
   }
@@ -48,11 +41,20 @@ object RestaurantsController extends Controller {
   }
 
   def show(id: String)  = Action {
-    
     val databaseRestaurant = DatabaseRestaurant.getById(id)
-    
     val restaurant = SimpleRestaurant.builder.from(databaseRestaurant).build
-    
+    Ok(Json.toJson(restaurant))
+  }
+
+  //  curl --include \
+  //    --request POST \
+  //    --header "Content-type: application/json" \
+  //    --data '{"id":"rest-id-00","name": "My Res Bird"}' \
+  //  http://localhost:9000/restaurants
+  def createAction = Action(BodyParsers.parse.json) { request =>
+    val restaurant = request.body.as[SimpleRestaurant]
+    val databaseRestaurant = DatabaseRestaurant.builder.from(restaurant).build
+    DatabaseRestaurant.save(databaseRestaurant)
     Ok(Json.toJson(restaurant))
   }
 }

@@ -13,6 +13,7 @@ GET        /couchbase1                 controllers.Application.couchbase1
 GET        /restaurants/populate       controllers.RestaurantsController.populate
 GET        /restaurants/search         controllers.RestaurantsController.search
 GET        /restaurants/:id            controllers.RestaurantsController.show(id)
+POST       /restaurants                controllers.RestaurantsController.createAction
 
 # Map static resources from the /public folder to the /assets URL path
 GET        /assets/*file               controllers.Assets.at(path="/public", file)
