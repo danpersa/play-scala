@@ -5,6 +5,13 @@ import play.api.libs.json._
 import scala.collection.JavaConversions
 import play.api.libs.json.JsObject
 import play.api.libs.functional.syntax._
+import scala.concurrent.Future
+import net.spy.memcached.internal.{OperationCompletionListener, OperationFuture}
+import scala.concurrent.Promise
+import scala.util.{Try, Failure, Success}
+import java.lang.Boolean
+import scala.async.Async.{async, await}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * @author dpersa
@@ -34,25 +41,31 @@ object DatabaseRestaurant {
   val client = Couchbase.getInstance()
 
   def getById(id: String):DatabaseRestaurant = {
-    val jsonString = client.get(id).asInstanceOf[String]
+    val jsonString = client.get(id)
     val jsonObject = Json.parse(jsonString)
     jsonObject.as[DatabaseRestaurant]
   }
 
-  def save(databaseRestaurant: DatabaseRestaurant) = {
-    val jsonObject: JsValue = Json.toJson(databaseRestaurant)
-    val jsonString: String = Json.stringify(jsonObject)
-    client.set(databaseRestaurant.id, jsonString).get()
+  def save(databaseRestaurant: DatabaseRestaurant) = async {
+
+    val f1 = async {
+      val jsonObject: JsValue = Json.toJson(databaseRestaurant)
+      Json.stringify(jsonObject)
+    }
+    
+    val r = client.set(databaseRestaurant.id, await { f1 })
+    await { r }
   }
+  
 
   def getBulk(ids: String*) = {
-    client.getBulk(JavaConversions.asJavaIterator(ids.iterator))
+    //client.getBulk(JavaConversions.asJavaIterator(ids.iterator))
   }
 
   def getBulk(ids: List[String]) = {
-    val restaurantsJsonString = client.getBulk(JavaConversions.asJavaIterator(ids.iterator)).values().toString
-    val restaurantsJson = Json.parse(restaurantsJsonString)
-    restaurantsJson.as[List[DatabaseRestaurant]]
+    //val restaurantsJsonString = client.getBulk(JavaConversions.asJavaIterator(ids.iterator)).values().toString
+    //val restaurantsJson = Json.parse(restaurantsJsonString)
+    //restaurantsJson.as[List[DatabaseRestaurant]]
   }
 
   def builder = new DatabaseRestaurantBuilder

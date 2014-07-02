@@ -7,6 +7,11 @@ import com.sksamuel.elastic4s.ElasticClient
 import com.sksamuel.elastic4s.ElasticDsl._
 import com.sksamuel.elastic4s.mappings.FieldType._
 import com.sksamuel.elastic4s.StopAnalyzer
+import play.api.libs.concurrent.Promise
+import scala.concurrent.duration._
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Success, Failure}
 
 /**
  * @author dpersa
@@ -51,10 +56,15 @@ object RestaurantsController extends Controller {
   //    --header "Content-type: application/json" \
   //    --data '{"id":"rest-id-00","name": "My Res Bird"}' \
   //  http://localhost:9000/restaurants
-  def createAction = Action(BodyParsers.parse.json) { request =>
+  def createAction = Action.async(BodyParsers.parse.json)  { request =>
     val restaurant = request.body.as[SimpleRestaurant]
     val databaseRestaurant = DatabaseRestaurant.builder.from(restaurant).build
-    DatabaseRestaurant.save(databaseRestaurant)
-    Ok(Json.toJson(restaurant))
+    val saveFuture = DatabaseRestaurant.save(databaseRestaurant)
+    val timoutFuture = Promise.timeout("Timeout", 1.second)
+    Future.firstCompletedOf(Seq(saveFuture, timoutFuture)) map {
+      case true => Ok(Json.toJson(restaurant))
+      case false => InternalServerError("fail")
+      case t: String => InternalServerError(t)
+    } 
   }
 }

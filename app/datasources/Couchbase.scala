@@ -71,7 +71,7 @@ object Couchbase {
    * Return the client object in a safe way. If the connection was
    * not opened previously, go ahead and create it.
    */
-  def getInstance(): CouchbaseClient = {
+  def getInstance(): ScalaCouchbaseClient = {
     if (client == null) {
       synchronized {
         if (client == null) {
@@ -80,7 +80,7 @@ object Couchbase {
       }
     }
 
-    return client;
+    return ScalaCouchbaseClient(client);
   }
 
 }

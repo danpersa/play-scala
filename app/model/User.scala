@@ -70,6 +70,7 @@ object DatabaseUser {
     val client = Couchbase.getInstance()
     val databaseUserJson = client.get(id).asInstanceOf[JsObject]
     databaseUserJson.as[DatabaseUser]
+    DatabaseUser("", "", "", List())
   }
 }
 

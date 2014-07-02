@@ -43,42 +43,43 @@ object Application extends Controller {
       future.map(json => Ok(json))
   }
   
-  def couchbase = Action.async {
-    val future = Future {
-      val client = Couchbase.getInstance()
-
-      val databaseRestaurant1 = new DatabaseRestaurant("rest-1", "The Bird")
-      val databaseRestaurant2 = new DatabaseRestaurant("rest-2", "White Trash")
-      val databaseUser = DatabaseUser.builder
-                                     .withId("userId")
-                                     .withEmail("dan@yahoo.com")
-                                     .withUsername("danix")
-                                     .addBookmark(databaseRestaurant1.id)
-                                     .addBookmark(databaseRestaurant2.id)
-                                     .build
-
-      // Store a Document
-      client.set(databaseRestaurant1.id, Json.toJson(databaseRestaurant1)).get()
-      client.set(databaseRestaurant2.id, Json.toJson(databaseRestaurant2)).get()
-      client.set(databaseUser.id, Json.toJson(databaseUser)).get()
-
-      val userFromDatabase = DatabaseUser.getById(databaseUser.id)
-
-      val bookmarksFromDatabase = DatabaseRestaurant.getBulk(userFromDatabase.bookmarkIds)
-
-      val bookmarks = bookmarksFromDatabase.map(dbRestaurant => Restaurant.from(dbRestaurant))
-
-      val complexUser = User.builder
-                            .from(userFromDatabase)
-                            .withBookmarks(bookmarks)
-                            .build
-
-      Json.toJson(complexUser)
-    }
-    
-    
-      
-    future.map(json => Ok(json))
+  def couchbase = Action {
+//    val future = Future {
+//      val client = Couchbase.getInstance()
+//
+//      val databaseRestaurant1 = new DatabaseRestaurant("rest-1", "The Bird")
+//      val databaseRestaurant2 = new DatabaseRestaurant("rest-2", "White Trash")
+//      val databaseUser = DatabaseUser.builder
+//                                     .withId("userId")
+//                                     .withEmail("dan@yahoo.com")
+//                                     .withUsername("danix")
+//                                     .addBookmark(databaseRestaurant1.id)
+//                                     .addBookmark(databaseRestaurant2.id)
+//                                     .build
+//
+//      // Store a Document
+//      client.set(databaseRestaurant1.id, Json.toJson(databaseRestaurant1)).get()
+//      client.set(databaseRestaurant2.id, Json.toJson(databaseRestaurant2)).get()
+//      client.set(databaseUser.id, Json.toJson(databaseUser)).get()
+//
+//      val userFromDatabase = DatabaseUser.getById(databaseUser.id)
+//
+//      val bookmarksFromDatabase = DatabaseRestaurant.getBulk(userFromDatabase.bookmarkIds)
+//
+//      val bookmarks = bookmarksFromDatabase.map(dbRestaurant => Restaurant.from(dbRestaurant))
+//
+//      val complexUser = User.builder
+//                            .from(userFromDatabase)
+//                            .withBookmarks(bookmarks)
+//                            .build
+//
+//      Json.toJson(complexUser)
+//    }
+//    
+//    
+//      
+//    future.map(json => Ok(json))
+    Ok("OK")
   }
 
   def couchbase1 = Action.async {

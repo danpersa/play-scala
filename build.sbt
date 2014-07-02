@@ -12,5 +12,6 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   "com.couchbase.client" % "couchbase-client" % "1.4.2",
-  "com.sksamuel.elastic4s" %% "elastic4s" % "1.2.1.1"
+  "com.sksamuel.elastic4s" %% "elastic4s" % "1.2.1.1",
+  "org.scala-lang.modules" %% "scala-async" % "0.9.1"
 )
